@@ -1,10 +1,11 @@
-[gd_scene load_steps=16 format=3 uid="uid://bolg0v35u6hoc"]
+[gd_scene load_steps=17 format=3 uid="uid://bolg0v35u6hoc"]
 
 [ext_resource type="Texture2D" uid="uid://cnsf521c7vliv" path="res://photo-1596825205490-7263b87acf8b.jpg" id="1_25ge7"]
 [ext_resource type="Script" path="res://hand.gd" id="2_melt3"]
 [ext_resource type="PackedScene" uid="uid://clplaj0534cya" path="res://rifle.glb" id="2_ojyka"]
 [ext_resource type="Texture2D" uid="uid://neuaw6pqk4b" path="res://panoramic-view-sea.jpg" id="2_rfvo0"]
-[ext_resource type="Texture2D" uid="uid://dwgar5yoyph1c" path="res://scope-34885.png" id="3_jurbi"]
+[ext_resource type="Script" path="res://Sprite2D.gd" id="5_cxoqj"]
+[ext_resource type="Texture2D" uid="uid://mu18vh0hcefd" path="res://scope-34899.png" id="6_mpwwm"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m0fnp"]
 albedo_texture = ExtResource("1_25ge7")
@@ -36,7 +37,7 @@ const sens = 0.4
 const lerp_speed = 9
 var direction = Vector3.ZERO
 var instance 
-
+@onready var barrel = $head/camera1/hand/sniperR1ff/RayCast3D
 
 
 
@@ -57,8 +58,14 @@ func _physics_process(delta):
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
-
+	if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor():
+		velocity.y = JUMP_VELOCITY
 		
+	if Input.is_action_just_pressed(\"shoot\"):
+		instance = bullet.instantiate()
+		instance.position = barrel.global_position
+		instance.transform.basis = barrel.global_transform.basis
+		get_parent().add_child(instance	)
 	
 	var input_dir = Input.get_vector(\"left\", \"right\", \"forword\", \"back\")
 			
@@ -124,19 +131,29 @@ shape = SubResource("CapsuleShape3D_efqhe")
 [node name="head" type="Node3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 
-[node name="Camera3D" type="Camera3D" parent="CharacterBody3D/head"]
+[node name="camera1" type="Camera3D" parent="CharacterBody3D/head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.23018)
+fov = 70.0
 
-[node name="hand" type="Node3D" parent="CharacterBody3D/head/Camera3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0561543, -1.04083)
+[node name="hand" type="Node3D" parent="CharacterBody3D/head/camera1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.402, 0.401)
 script = ExtResource("2_melt3")
+default_pos = Vector3(0.824452, -0.683128, -1.32054)
+ad_pos = Vector3(0, -0.401817, 0.401238)
+camera_path = NodePath("..")
 
-[node name="sniperR1ff" parent="CharacterBody3D/head/Camera3D/hand" instance=ExtResource("2_ojyka")]
-transform = Transform3D(2.3, 0, 0, 0, 2.3, 0, 0, 0, 2.3, 0.328674, -0.4937, -0.1492)
+[node name="sniperR1ff" parent="CharacterBody3D/head/camera1/hand" instance=ExtResource("2_ojyka")]
+transform = Transform3D(2.3, 0, 0, 0, 2.3, 0, 0, 0, 2.3, 0, 0, 0)
 
-[node name="RayCast3D" type="RayCast3D" parent="CharacterBody3D/head/Camera3D/hand/sniperR1ff"]
-transform = Transform3D(0.620054, 0, 0, 0, 0.620055, 0, 0, 0, 0.620054, -0.00183123, 0.0927744, -0.8094)
+[node name="RayCast3D" type="RayCast3D" parent="CharacterBody3D/head/camera1/hand/sniperR1ff"]
+transform = Transform3D(0.620054, 0, 0, 0, 0.620055, 0, 0, 0, 0.620054, 0.000243193, 0.0927749, -0.8094)
 target_position = Vector3(0, 0, -1)
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody3D/head/camera1/hand"]
+position = Vector2(569.5, 350)
+scale = Vector2(0.699196, 0.705)
+texture = ExtResource("6_mpwwm")
+script = ExtResource("5_cxoqj")
 
 [node name="env" type="Node3D" parent="."]
 
@@ -148,14 +165,3 @@ transform = Transform3D(-0.882127, -0.471012, -2.05886e-08, 0, -4.37114e-08, 1, 
 light_color = Color(0.701961, 0.423529, 0, 1)
 light_energy = 0.135
 shadow_enabled = true
-
-[node name="Scope-34885" type="Sprite2D" parent="."]
-position = Vector2(590, 318)
-texture = ExtResource("3_jurbi")
-region_enabled = true
-
-[node name="Scope-34886" type="Sprite2D" parent="."]
-position = Vector2(590, 319)
-texture = ExtResource("3_jurbi")
-region_enabled = true
-region_rect = Rect2(213.015, 209.797, 55.6358, 62.9563)
