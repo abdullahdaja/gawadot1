@@ -1,0 +1,161 @@
+[gd_scene load_steps=16 format=3 uid="uid://bolg0v35u6hoc"]
+
+[ext_resource type="Texture2D" uid="uid://cnsf521c7vliv" path="res://photo-1596825205490-7263b87acf8b.jpg" id="1_25ge7"]
+[ext_resource type="Script" path="res://hand.gd" id="2_melt3"]
+[ext_resource type="PackedScene" uid="uid://clplaj0534cya" path="res://rifle.glb" id="2_ojyka"]
+[ext_resource type="Texture2D" uid="uid://neuaw6pqk4b" path="res://panoramic-view-sea.jpg" id="2_rfvo0"]
+[ext_resource type="Texture2D" uid="uid://dwgar5yoyph1c" path="res://scope-34885.png" id="3_jurbi"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m0fnp"]
+albedo_texture = ExtResource("1_25ge7")
+normal_scale = -11.61
+uv1_triplanar = true
+uv1_triplanar_sharpness = 0.594603
+uv1_world_triplanar = true
+uv2_scale = Vector3(0.845, 0.845, 0.845)
+uv2_triplanar_sharpness = 0.63728
+
+[sub_resource type="BoxMesh" id="BoxMesh_lojjr"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_4jme3"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_segu6"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_0ixsa"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[sub_resource type="GDScript" id="GDScript_cifx8"]
+script/source = "extends CharacterBody3D
+
+@onready var head = $head
+var bullet = load(\"res://bullet.tscn\")
+const SPEED = 8
+const JUMP_VELOCITY = 4.5
+const sens = 0.4
+const lerp_speed = 9
+var direction = Vector3.ZERO
+var instance 
+
+
+
+
+# Get the gravity from the project settings to be synced with RigidBody nodes.
+var gravity = ProjectSettings.get_setting(\"physics/3d/default_gravity\")
+
+
+
+func _ready():
+
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func _input(event):
+	if event is InputEventMouseMotion:
+		rotate_y(-deg_to_rad(event.relative.x*sens))
+		head.rotate_x(-deg_to_rad(event.relative.y*sens))
+func _physics_process(delta):
+	# Add the gravity.
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
+		
+	
+	var input_dir = Input.get_vector(\"left\", \"right\", \"forword\", \"back\")
+			
+				
+	direction = lerp(direction,(transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized(), delta *lerp_speed)
+	if direction:
+		velocity.x = direction.x * SPEED
+		velocity.z = direction.z * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+		velocity.z = move_toward(velocity.z, 0, SPEED)
+
+	move_and_slide()
+	
+
+"
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_efqhe"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_psxps"]
+panorama = ExtResource("2_rfvo0")
+
+[sub_resource type="Sky" id="Sky_aspk4"]
+sky_material = SubResource("PanoramaSkyMaterial_psxps")
+
+[sub_resource type="Environment" id="Environment_b8ngd"]
+background_mode = 2
+sky = SubResource("Sky_aspk4")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="world" type="Node3D"]
+
+[node name="stage" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="stage"]
+transform = Transform3D(200, 0, 0, 0, 10, 0, 0, 0, 200, 0, -5, 0)
+material_override = SubResource("StandardMaterial3D_m0fnp")
+mesh = SubResource("BoxMesh_lojjr")
+skeleton = NodePath("")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="stage/MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="stage/MeshInstance3D/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_4jme3")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="stage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.412269, 0)
+mesh = SubResource("BoxMesh_segu6")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="stage/MeshInstance3D2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="stage/MeshInstance3D2/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_0ixsa")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.57898, 0)
+script = SubResource("GDScript_cifx8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+shape = SubResource("CapsuleShape3D_efqhe")
+
+[node name="head" type="Node3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D/head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.23018)
+
+[node name="hand" type="Node3D" parent="CharacterBody3D/head/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0561543, -1.04083)
+script = ExtResource("2_melt3")
+
+[node name="sniperR1ff" parent="CharacterBody3D/head/Camera3D/hand" instance=ExtResource("2_ojyka")]
+transform = Transform3D(2.3, 0, 0, 0, 2.3, 0, 0, 0, 2.3, 0.328674, -0.4937, -0.1492)
+
+[node name="RayCast3D" type="RayCast3D" parent="CharacterBody3D/head/Camera3D/hand/sniperR1ff"]
+transform = Transform3D(0.620054, 0, 0, 0, 0.620055, 0, 0, 0, 0.620054, -0.00183123, 0.0927744, -0.8094)
+target_position = Vector3(0, 0, -1)
+
+[node name="env" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="env"]
+environment = SubResource("Environment_b8ngd")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="env"]
+transform = Transform3D(-0.882127, -0.471012, -2.05886e-08, 0, -4.37114e-08, 1, -0.471012, 0.882127, 3.8559e-08, 0, 7.90872, 24.6746)
+light_color = Color(0.701961, 0.423529, 0, 1)
+light_energy = 0.135
+shadow_enabled = true
+
+[node name="Scope-34885" type="Sprite2D" parent="."]
+position = Vector2(590, 318)
+texture = ExtResource("3_jurbi")
+region_enabled = true
+
+[node name="Scope-34886" type="Sprite2D" parent="."]
+position = Vector2(590, 319)
+texture = ExtResource("3_jurbi")
+region_enabled = true
+region_rect = Rect2(213.015, 209.797, 55.6358, 62.9563)
