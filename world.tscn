@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bolg0v35u6hoc"]
+[gd_scene load_steps=18 format=3 uid="uid://bolg0v35u6hoc"]
 
 [ext_resource type="Texture2D" uid="uid://cnsf521c7vliv" path="res://photo-1596825205490-7263b87acf8b.jpg" id="1_25ge7"]
 [ext_resource type="Script" path="res://hand.gd" id="2_melt3"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://neuaw6pqk4b" path="res://panoramic-view-sea.jpg" id="2_rfvo0"]
 [ext_resource type="Script" path="res://Sprite2D.gd" id="5_cxoqj"]
 [ext_resource type="Texture2D" uid="uid://mu18vh0hcefd" path="res://scope-34899.png" id="6_mpwwm"]
+[ext_resource type="PackedScene" uid="uid://cmmlqckj5iax7" path="res://med_poly_player.tscn" id="7_68fjk"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m0fnp"]
 albedo_texture = ExtResource("1_25ge7")
@@ -31,7 +32,7 @@ script/source = "extends CharacterBody3D
 
 @onready var head = $head
 var bullet = load(\"res://bullet.tscn\")
-const SPEED = 8
+const SPEED = 40
 const JUMP_VELOCITY = 4.5
 const sens = 0.4
 const lerp_speed = 9
@@ -165,3 +166,6 @@ transform = Transform3D(-0.882127, -0.471012, -2.05886e-08, 0, -4.37114e-08, 1, 
 light_color = Color(0.701961, 0.423529, 0, 1)
 light_energy = 0.135
 shadow_enabled = true
+
+[node name="med_poly_player" parent="." instance=ExtResource("7_68fjk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -12)

@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmmlqckj5iax7"]
+
+[ext_resource type="PackedScene" uid="uid://b10l1wc5ukb3y" path="res://med_poly_player.blend" id="1_khwvp"]
+
+[node name="med_poly_player" instance=ExtResource("1_khwvp")]

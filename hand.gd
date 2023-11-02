@@ -7,7 +7,7 @@ var vis = false
 var camera : Camera3D 
 
 var def_view = 70.0
-var ad_view =20.0
+var ad_view =10.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
